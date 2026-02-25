@@ -131,6 +131,12 @@ Feature: Bootstrap monorepo with Bun + Hono backend, Next.js frontend, and Doppl
       | PORT                |
     And it should not contain any real secret values
 
+  Scenario: Backend reads secrets via process.env at runtime
+    Given the file "apps/api/src/index.ts" exists
+    Then it should read the port from "process.env.PORT"
+    And the backend should not hardcode any secret values
+    And Doppler should inject environment variables at runtime via "doppler run"
+
   Scenario: README documents Doppler workflow
     Given the file "README.md" exists at the repo root
     Then it should contain the command "doppler run -- bun run dev"
