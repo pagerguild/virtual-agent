@@ -1,0 +1,9 @@
+{
+  "name": "virtual-agent",
+  "private": true,
+  "workspaces": ["apps/*"],
+  "scripts": {
+    "dev": "bun run --filter '*' dev",
+    "test": "bun test"
+  }
+}
