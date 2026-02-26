@@ -5,5 +5,8 @@
   "scripts": {
     "dev": "bun run --filter '*' dev",
     "test": "bun test"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.58.2"
   }
 }
