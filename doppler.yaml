@@ -1,3 +1,14 @@
 setup:
   project: virtual-agent
   config: dev
+
+environments:
+  dev:
+    config: dev
+    target: local development
+  stg:
+    config: stg
+    target: Vercel Preview
+  prd:
+    config: prd
+    target: Vercel Production
