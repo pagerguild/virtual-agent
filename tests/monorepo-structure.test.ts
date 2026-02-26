@@ -215,10 +215,10 @@ describe("Frontend (apps/web)", () => {
     expect(pkg.devDependencies?.tailwindcss).toBeDefined();
   });
 
-  it("has a dev script running next on port 3000", () => {
+  it("has a dev script running next via portless", () => {
     const pkg = readJson("apps/web/package.json");
     expect(pkg.scripts?.dev).toContain("next dev");
-    expect(pkg.scripts?.dev).toContain("3000");
+    expect(pkg.scripts?.dev).toContain("portless");
   });
 
   it("has tsconfig.json extending the root base", () => {
