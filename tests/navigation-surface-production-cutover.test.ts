@@ -301,7 +301,7 @@ describe("AC #11 — README is accurate for single-app architecture", () => {
   it("documents required environment variables for Vercel", () => {
     const content = readText("README.md");
     expect(content).toContain("NEXT_PUBLIC_SUPABASE_URL");
-    expect(content).toContain("NEXT_PUBLIC_SUPABASE_ANON_KEY");
+    expect(content).toContain("NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY");
     expect(content).toContain("DATABASE_URL");
   });
 

@@ -40,3 +40,4 @@ test-results/
 
 # Attractor logs
 .attractor/
+.vercel

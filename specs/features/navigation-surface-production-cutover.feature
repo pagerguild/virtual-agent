@@ -100,7 +100,7 @@ Feature: Navigation Surface & Production Cutover — Sidebar, pages, Vercel depl
     Then the following environment variables should be set:
       | variable                       |
       | NEXT_PUBLIC_SUPABASE_URL       |
-      | NEXT_PUBLIC_SUPABASE_ANON_KEY  |
+      | NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY  |
       | DATABASE_URL                   |
 
   # ── AC #7 — Production login works ────────────────────────────────

@@ -96,7 +96,7 @@ describe("AC #3 — .env.example begins with Doppler comment block and lists all
     const content = readText(".env.example");
     const expectedVars = [
       "NEXT_PUBLIC_SUPABASE_URL",
-      "NEXT_PUBLIC_SUPABASE_ANON_KEY",
+      "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY",
       "DATABASE_URL",
       "AMADEUS_API_KEY",
       "AMADEUS_API_SECRET",
@@ -140,7 +140,7 @@ describe("AC #4 — .env.local.example states optional when using Doppler", () =
   it("still contains Supabase env var placeholders", () => {
     const content = readText(".env.local.example");
     expect(content).toContain("NEXT_PUBLIC_SUPABASE_URL");
-    expect(content).toContain("NEXT_PUBLIC_SUPABASE_ANON_KEY");
+    expect(content).toContain("NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY");
   });
 });
 

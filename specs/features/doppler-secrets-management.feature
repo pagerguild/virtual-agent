@@ -14,7 +14,7 @@ Feature: Doppler Secrets Management — Centralize all environment variables in 
   Scenario: All required secrets are populated in each environment
     Given the "virtual-agent" Doppler project is open
     When the developer views any environment config
-    Then NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY, and DATABASE_URL should be set
+    Then NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY, and DATABASE_URL should be set
     And AMADEUS_API_KEY, AMADEUS_API_SECRET, GOOGLE_MAPS_API_KEY, and RESEND_API_KEY should be present (values may be empty in dev)
 
   # ── AC #2 — Local development uses Doppler CLI ─────────────────────

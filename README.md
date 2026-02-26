@@ -166,7 +166,7 @@ The app starts at [http://localhost:3000](http://localhost:3000).
 
    **Fallback — Manual entry:** If not using Doppler, add environment variables in Vercel project settings:
    - `NEXT_PUBLIC_SUPABASE_URL` — Your Supabase project URL (from Supabase Dashboard > Settings > API)
-   - `NEXT_PUBLIC_SUPABASE_ANON_KEY` — Your Supabase anonymous/publishable key (from Supabase Dashboard > Settings > API)
+   - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` — Your Supabase publishable key (from Supabase Dashboard > Settings > API)
    - `DATABASE_URL` — Supabase Postgres connection string (use the **connection pooler** URL on port 6543 for Vercel Serverless Functions)
 
 4. Deploy — Vercel will run `next build` and deploy automatically
@@ -178,7 +178,7 @@ The app starts at [http://localhost:3000](http://localhost:3000).
 | Variable | Description |
 |---|---|
 | `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anonymous/publishable key |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Supabase publishable key |
 | `DATABASE_URL` | Supabase Postgres connection string |
 | `AMADEUS_API_KEY` | Amadeus flight API key |
 | `AMADEUS_API_SECRET` | Amadeus flight API secret |

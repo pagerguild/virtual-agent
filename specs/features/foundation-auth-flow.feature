@@ -14,12 +14,12 @@ Feature: Foundation & Auth Flow — Starter-aligned single-app baseline with Sup
   Scenario: Supabase browser client utility exists
     Given the file "lib/supabase/client.ts" exists
     Then it should create a Supabase client using "@supabase/ssr" for browser usage
-    And it should reference "NEXT_PUBLIC_SUPABASE_URL" and "NEXT_PUBLIC_SUPABASE_ANON_KEY"
+    And it should reference "NEXT_PUBLIC_SUPABASE_URL" and "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY"
 
   Scenario: Supabase server client utility exists
     Given the file "lib/supabase/server.ts" exists
     Then it should create a Supabase client using "@supabase/ssr" for server-side usage
-    And it should reference "NEXT_PUBLIC_SUPABASE_URL" and "NEXT_PUBLIC_SUPABASE_ANON_KEY"
+    And it should reference "NEXT_PUBLIC_SUPABASE_URL" and "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY"
 
   Scenario: Auth callback route follows starter conventions
     Given the file "app/auth/callback/route.ts" exists
@@ -37,7 +37,7 @@ Feature: Foundation & Auth Flow — Starter-aligned single-app baseline with Sup
     Then it should contain the following environment variables:
       | variable                       |
       | NEXT_PUBLIC_SUPABASE_URL       |
-      | NEXT_PUBLIC_SUPABASE_ANON_KEY  |
+      | NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY  |
     And it should not contain any real secret values
 
   # ── AC #2 — Signup works ───────────────────────────────────────────
