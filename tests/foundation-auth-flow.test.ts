@@ -67,10 +67,10 @@ describe("AC #1 — Supabase browser client utility", () => {
     expect(content).toContain("@supabase/ssr");
   });
 
-  it("references NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY", () => {
+  it("references NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY", () => {
     const content = readText("lib/supabase/client.ts");
     expect(content).toContain("NEXT_PUBLIC_SUPABASE_URL");
-    expect(content).toContain("NEXT_PUBLIC_SUPABASE_ANON_KEY");
+    expect(content).toContain("NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY");
   });
 });
 
@@ -87,10 +87,10 @@ describe("AC #1 — Supabase server client utility", () => {
     expect(content).toContain("@supabase/ssr");
   });
 
-  it("references NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY", () => {
+  it("references NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY", () => {
     const content = readText("lib/supabase/server.ts");
     expect(content).toContain("NEXT_PUBLIC_SUPABASE_URL");
-    expect(content).toContain("NEXT_PUBLIC_SUPABASE_ANON_KEY");
+    expect(content).toContain("NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY");
   });
 });
 
@@ -151,18 +151,19 @@ describe("AC #1 — .env.local.example documents required Supabase variables", (
     expect(content).toContain("NEXT_PUBLIC_SUPABASE_URL");
   });
 
-  it("contains NEXT_PUBLIC_SUPABASE_ANON_KEY", () => {
+  it("contains NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY", () => {
     const content = readText(".env.local.example");
-    expect(content).toContain("NEXT_PUBLIC_SUPABASE_ANON_KEY");
+    expect(content).toContain("NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY");
   });
 
   it("does not contain real secret values", () => {
     const content = readText(".env.local.example");
-    const lines = content.split("\n").filter((l) => l.includes("="));
+    const lines = content.split("\n").filter((l) => l.includes("=") && !l.startsWith("#"));
     for (const line of lines) {
       const value = line.split("=")[1]?.trim();
-      // Values should be empty or placeholder-only
-      expect(value === "" || value === undefined).toBe(true);
+      // Values should be empty, undefined, or placeholder-only (matching Vercel starter convention)
+      const isPlaceholder = !value || value.startsWith("your-");
+      expect(isPlaceholder).toBe(true);
     }
   });
 

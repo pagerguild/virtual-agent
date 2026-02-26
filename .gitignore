@@ -32,6 +32,9 @@ bun.lockb
 # Turbo
 .turbo/
 
+# Supabase
+supabase/.temp/
+
 # Test results
 test-results/
 
