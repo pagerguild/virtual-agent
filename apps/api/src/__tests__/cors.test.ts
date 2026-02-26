@@ -9,7 +9,7 @@ describe("CORS middleware", () => {
     app.use(
       "*",
       cors({
-        origin: process.env.FRONTEND_URL || "http://localhost:3000",
+        origin: process.env.FRONTEND_URL || "http://virtual-agent.localhost:1355",
         allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
         allowHeaders: ["Content-Type", "Authorization"],
       })
@@ -19,12 +19,12 @@ describe("CORS middleware", () => {
     const request = new Request("http://localhost/health", {
       method: "GET",
       headers: {
-        Origin: "http://localhost:3000",
+        Origin: "http://virtual-agent.localhost:1355",
       },
     });
 
     const response = await app.request(request);
     const allowOrigin = response.headers.get("access-control-allow-origin");
-    expect(allowOrigin).toBe("http://localhost:3000");
+    expect(allowOrigin).toBe("http://virtual-agent.localhost:1355");
   });
 });
