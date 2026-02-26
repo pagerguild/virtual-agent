@@ -4,37 +4,47 @@ Tour logistics automation for performing artists. Optimize flight routing, gener
 
 ## Tech Stack
 
-- **Runtime:** [Bun](https://bun.sh)
-- **Backend:** [Hono](https://hono.dev) (Web Standards-based)
-- **Frontend:** [Next.js](https://nextjs.org) (App Router) + [Tailwind CSS](https://tailwindcss.com) + [TanStack React Query](https://tanstack.com/query)
-- **Secrets:** [Doppler](https://doppler.com)
+- **Framework:** [Next.js](https://nextjs.org) (App Router)
+- **Auth:** [Supabase Auth](https://supabase.com/auth)
+- **Database:** [Supabase Postgres](https://supabase.com/database)
+- **ORM:** [Drizzle ORM](https://orm.drizzle.team) (pgTable)
+- **Styling:** [Tailwind CSS](https://tailwindcss.com)
+- **Deployment:** [Vercel](https://vercel.com)
 
 ## Prerequisites
 
-- [Bun](https://bun.sh) >= 1.0
-- [Doppler CLI](https://docs.doppler.com/docs/install-cli) (for secrets management)
-- Access to the `virtual-agent` Doppler project
+- [Node.js](https://nodejs.org) >= 18
+- [Bun](https://bun.sh) >= 1.0 (for tests)
+- A [Supabase](https://supabase.com) project (free or Pro)
+- A [Vercel](https://vercel.com) account (for deployment)
 
 ## Project Structure
 
 ```
-├── apps/
-│   ├── api/          # Bun + Hono backend (port 4000)
-│   │   └── src/
-│   │       ├── index.ts
-│   │       ├── routes/
-│   │       ├── services/
-│   │       ├── db/
-│   │       └── lib/
-│   └── web/          # Next.js frontend (port 3000)
-│       └── src/
-│           ├── app/
-│           ├── components/
-│           └── lib/
-├── specs/            # Project specifications
-├── doppler.yaml      # Doppler project config
-├── .env.example      # Expected environment variables
-└── tsconfig.base.json
+├── app/
+│   ├── (dashboard)/      # Protected routes (Dashboard, Tours, Riders, Settings)
+│   ├── login/            # Login page (public)
+│   ├── signup/           # Signup page (public)
+│   ├── auth/callback/    # Supabase auth callback
+│   ├── layout.tsx        # Root layout
+│   └── globals.css       # Global styles
+├── components/           # React components
+│   ├── sidebar.tsx       # Dashboard sidebar navigation
+│   └── sign-out-button.tsx
+├── db/
+│   ├── schema/           # Drizzle ORM schemas (pgTable)
+│   ├── migrations/       # Drizzle migration files
+│   ├── index.ts          # Database client
+│   └── seed.ts           # Seed script
+├── lib/
+│   └── supabase/         # Supabase client helpers
+│       ├── client.ts     # Browser client
+│       ├── server.ts     # Server client
+│       └── middleware.ts  # Auth middleware
+├── specs/                # Project specifications
+├── drizzle.config.ts     # Drizzle config (Supabase Postgres)
+├── middleware.ts          # Next.js middleware (auth protection)
+└── package.json
 ```
 
 ## Getting Started
@@ -42,63 +52,72 @@ Tour logistics automation for performing artists. Optimize flight routing, gener
 ### 1. Install dependencies
 
 ```bash
-bun install
+npm install
 ```
 
-### 2. Set up Doppler
+### 2. Set up Supabase
+
+1. Create a Supabase project at [supabase.com](https://supabase.com)
+2. Copy your project URL and anon key from the project settings
+3. Copy `.env.example` to `.env.local` and fill in your values:
 
 ```bash
-# Login to Doppler (first time only)
-doppler login
-
-# Set up the project (run from repo root)
-doppler setup
+cp .env.example .env.local
 ```
 
-### 3. Run in development
-
-**With Doppler (recommended):**
+### 3. Set up the database
 
 ```bash
-doppler run -- bun run dev
+# Generate migrations from schema
+npm run db:generate
+
+# Apply migrations to Supabase Postgres
+npm run db:migrate
+
+# Seed with sample data
+npm run db:seed
 ```
 
-This starts both the API (port 4000) and web app (port 3000) concurrently, with secrets injected by Doppler.
-
-**Without Doppler (using local .env):**
-
-Copy `.env.example` to `.env` in the root directory, fill in your values, then:
+### 4. Run in development
 
 ```bash
-bun run dev
+npm run dev
 ```
 
-### Running individual apps
+The app starts at [http://localhost:3000](http://localhost:3000).
 
-```bash
-# Backend only
-cd apps/api && bun run dev
+## Deployment (Vercel)
 
-# Frontend only
-cd apps/web && bun run dev
-```
+1. Connect the repository to Vercel
+2. Add environment variables in Vercel project settings:
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+   - `DATABASE_URL`
+3. Deploy
 
 ## Environment Variables
 
 | Variable | Description |
 |---|---|
-| `DATABASE_URL` | Database connection string |
+| `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anonymous key |
+| `DATABASE_URL` | Supabase Postgres connection string |
 | `AMADEUS_API_KEY` | Amadeus flight API key |
 | `AMADEUS_API_SECRET` | Amadeus flight API secret |
 | `GOOGLE_MAPS_API_KEY` | Google Maps API key |
 | `RESEND_API_KEY` | Resend email service API key |
-| `FRONTEND_URL` | Frontend URL for CORS (default: `http://localhost:3000`) |
-| `PORT` | Backend port (default: `4000`) |
 
-## API
+## Auth
 
-### Health Check
+- Unauthenticated users are redirected to `/login`
+- Authentication is handled by Supabase Auth
+- Protected routes are enforced via Next.js middleware
+- Sign up creates a new Supabase user account
+- Sign in uses email/password authentication
 
-```
-GET /health → { "status": "ok" }
-```
+## Database
+
+- Schema defined with Drizzle ORM using `pgTable` (Postgres)
+- Tables: artists, tours, gigs, bookings, riders
+- Migrations managed via `drizzle-kit`
+- Seed data includes: 1 artist (Chic), 1 tour, 5 gigs, 2 bookings, 1 rider

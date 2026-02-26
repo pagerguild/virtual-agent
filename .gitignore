@@ -5,6 +5,7 @@ node_modules/
 .env
 .env.*
 !.env.example
+!.env.local.example
 
 # Build outputs
 dist/
@@ -30,6 +31,9 @@ bun.lockb
 
 # Turbo
 .turbo/
+
+# Supabase
+supabase/.temp/
 
 # Test results
 test-results/
