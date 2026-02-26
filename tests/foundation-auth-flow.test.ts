@@ -67,10 +67,10 @@ describe("AC #1 — Supabase browser client utility", () => {
     expect(content).toContain("@supabase/ssr");
   });
 
-  it("references NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY", () => {
+  it("references NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY", () => {
     const content = readText("lib/supabase/client.ts");
     expect(content).toContain("NEXT_PUBLIC_SUPABASE_URL");
-    expect(content).toContain("NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY");
+    expect(content).toContain("NEXT_PUBLIC_SUPABASE_ANON_KEY");
   });
 });
 
@@ -87,10 +87,10 @@ describe("AC #1 — Supabase server client utility", () => {
     expect(content).toContain("@supabase/ssr");
   });
 
-  it("references NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY", () => {
+  it("references NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY", () => {
     const content = readText("lib/supabase/server.ts");
     expect(content).toContain("NEXT_PUBLIC_SUPABASE_URL");
-    expect(content).toContain("NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY");
+    expect(content).toContain("NEXT_PUBLIC_SUPABASE_ANON_KEY");
   });
 });
 
@@ -151,9 +151,9 @@ describe("AC #1 — .env.local.example documents required Supabase variables", (
     expect(content).toContain("NEXT_PUBLIC_SUPABASE_URL");
   });
 
-  it("contains NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY", () => {
+  it("contains NEXT_PUBLIC_SUPABASE_ANON_KEY", () => {
     const content = readText(".env.local.example");
-    expect(content).toContain("NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY");
+    expect(content).toContain("NEXT_PUBLIC_SUPABASE_ANON_KEY");
   });
 
   it("does not contain real secret values", () => {
@@ -303,9 +303,14 @@ describe("AC #6 — Root page redirects to /dashboard", () => {
 // ── AC #6 — Build succeeds ──────────────────────────────────────────
 
 describe("AC #6 — App builds successfully", () => {
-  it("tsconfig.json excludes apps/ directory to avoid legacy type errors", () => {
+  it("tsconfig.json excludes node_modules", () => {
     const config = readJson("tsconfig.json");
-    expect(config.exclude).toContain("apps");
+    expect(config.exclude).toContain("node_modules");
+  });
+
+  it("tsconfig.json does not reference legacy apps/ directory", () => {
+    const config = readJson("tsconfig.json");
+    expect(config.exclude).not.toContain("apps");
   });
 });
 
@@ -333,26 +338,33 @@ describe("Sidebar navigation uses /dashboard prefix", () => {
   });
 });
 
-// ── Legacy (dashboard) route group pages redirect ───────────────────
+// ── Dashboard sub-pages exist under /dashboard/ ─────────────────────
 
-describe("Legacy (dashboard) route group pages redirect to /dashboard", () => {
-  it("(dashboard)/page.tsx redirects to /dashboard", () => {
-    const content = readText("app/(dashboard)/page.tsx");
-    expect(content).toContain('redirect("/dashboard")');
+describe("Dashboard sub-pages exist under /dashboard/", () => {
+  it("app/dashboard/tours/page.tsx exists", () => {
+    expect(existsSync(resolve(ROOT, "app/dashboard/tours/page.tsx"))).toBe(true);
   });
 
-  it("(dashboard)/tours/page.tsx redirects to /dashboard", () => {
-    const content = readText("app/(dashboard)/tours/page.tsx");
-    expect(content).toContain('redirect("/dashboard")');
+  it("app/dashboard/riders/page.tsx exists", () => {
+    expect(existsSync(resolve(ROOT, "app/dashboard/riders/page.tsx"))).toBe(true);
   });
 
-  it("(dashboard)/riders/page.tsx redirects to /dashboard", () => {
-    const content = readText("app/(dashboard)/riders/page.tsx");
-    expect(content).toContain('redirect("/dashboard")');
+  it("app/dashboard/settings/page.tsx exists", () => {
+    expect(existsSync(resolve(ROOT, "app/dashboard/settings/page.tsx"))).toBe(true);
   });
 
-  it("(dashboard)/settings/page.tsx redirects to /dashboard", () => {
-    const content = readText("app/(dashboard)/settings/page.tsx");
-    expect(content).toContain('redirect("/dashboard")');
+  it("tours page queries tour data", () => {
+    const content = readText("app/dashboard/tours/page.tsx");
+    expect(content).toContain("getToursWithGigs");
+  });
+
+  it("riders page queries rider data", () => {
+    const content = readText("app/dashboard/riders/page.tsx");
+    expect(content).toContain("getRidersWithGigs");
+  });
+
+  it("settings page displays user email", () => {
+    const content = readText("app/dashboard/settings/page.tsx");
+    expect(content).toContain("user?.email");
   });
 });
