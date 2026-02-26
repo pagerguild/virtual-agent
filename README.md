@@ -22,28 +22,35 @@ Tour logistics automation for performing artists. Optimize flight routing, gener
 
 ```
 ├── app/
-│   ├── (dashboard)/      # Protected routes (Dashboard, Tours, Riders, Settings)
-│   ├── login/            # Login page (public)
-│   ├── signup/           # Signup page (public)
-│   ├── auth/callback/    # Supabase auth callback
-│   ├── layout.tsx        # Root layout
-│   └── globals.css       # Global styles
-├── components/           # React components
-│   ├── sidebar.tsx       # Dashboard sidebar navigation
-│   └── sign-out-button.tsx
+│   ├── dashboard/            # Protected dashboard routes
+│   │   ├── layout.tsx        # Dashboard layout with sidebar
+│   │   ├── page.tsx          # Dashboard overview
+│   │   ├── tours/page.tsx    # Tours page (tour + gig data)
+│   │   ├── riders/page.tsx   # Riders page (hospitality items)
+│   │   └── settings/page.tsx # Settings page (user info)
+│   ├── login/                # Login page (public)
+│   ├── signup/               # Signup page (public)
+│   ├── auth/callback/        # Supabase auth callback
+│   ├── layout.tsx            # Root layout
+│   └── globals.css           # Global styles
+├── components/               # React components
+│   ├── sidebar.tsx           # Dashboard sidebar navigation
+│   └── sign-out-button.tsx   # Sign-out button
 ├── db/
-│   ├── schema/           # Drizzle ORM schemas (pgTable)
-│   ├── migrations/       # Drizzle migration files
-│   ├── index.ts          # Database client
-│   └── seed.ts           # Seed script
+│   ├── schema/               # Drizzle ORM schemas (pgTable)
+│   ├── queries/              # Data access queries
+│   ├── migrations/           # Drizzle migration files
+│   ├── index.ts              # Database client
+│   └── seed.ts               # Seed script
 ├── lib/
-│   └── supabase/         # Supabase client helpers
-│       ├── client.ts     # Browser client
-│       ├── server.ts     # Server client
-│       └── middleware.ts  # Auth middleware
-├── specs/                # Project specifications
-├── drizzle.config.ts     # Drizzle config (Supabase Postgres)
-├── middleware.ts          # Next.js middleware (auth protection)
+│   └── supabase/             # Supabase client helpers
+│       ├── client.ts         # Browser client
+│       ├── server.ts         # Server client
+│       └── middleware.ts     # Auth middleware
+├── specs/                    # Project specifications
+├── tests/                    # Test files
+├── drizzle.config.ts         # Drizzle config (Supabase Postgres)
+├── middleware.ts              # Next.js middleware (auth protection)
 └── package.json
 ```
 
@@ -89,18 +96,21 @@ The app starts at [http://localhost:3000](http://localhost:3000).
 ## Deployment (Vercel)
 
 1. Connect the repository to Vercel
-2. Add environment variables in Vercel project settings:
-   - `NEXT_PUBLIC_SUPABASE_URL`
-   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-   - `DATABASE_URL`
-3. Deploy
+2. Set the **Root Directory** to `virtual-agent` (if this is inside a parent repo)
+3. Add environment variables in Vercel project settings:
+   - `NEXT_PUBLIC_SUPABASE_URL` — Your Supabase project URL (from Supabase Dashboard > Settings > API)
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY` — Your Supabase anonymous/publishable key (from Supabase Dashboard > Settings > API)
+   - `DATABASE_URL` — Supabase Postgres connection string (use the **connection pooler** URL on port 6543 for Vercel Serverless Functions)
+4. Deploy — Vercel will run `next build` and deploy automatically
+
+> **Note:** For production, use the Supabase **connection pooler URL** (port 6543) as your `DATABASE_URL` instead of the direct connection string. This avoids connection exhaustion in serverless environments.
 
 ## Environment Variables
 
 | Variable | Description |
 |---|---|
 | `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anonymous key |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anonymous/publishable key |
 | `DATABASE_URL` | Supabase Postgres connection string |
 | `AMADEUS_API_KEY` | Amadeus flight API key |
 | `AMADEUS_API_SECRET` | Amadeus flight API secret |
@@ -121,3 +131,12 @@ The app starts at [http://localhost:3000](http://localhost:3000).
 - Tables: artists, tours, gigs, bookings, riders
 - Migrations managed via `drizzle-kit`
 - Seed data includes: 1 artist (Chic), 1 tour, 5 gigs, 2 bookings, 1 rider
+
+## Testing
+
+```bash
+# Run all tests
+npm test
+```
+
+Tests use [Bun's built-in test runner](https://bun.sh/docs/cli/test). Test files are located in `tests/`, `db/__tests__/`, and `db/schema/__tests__/`.
