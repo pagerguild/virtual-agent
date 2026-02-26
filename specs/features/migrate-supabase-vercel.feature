@@ -1,144 +1,91 @@
-Feature: Migrate virtual-agent to single Next.js app with Supabase Postgres and Vercel deployment
+Feature: Migrate virtual-agent to a single Next.js app with Supabase Postgres and Vercel deployment
   As a developer contributing to virtual-agent
-  I want to collapse the Bun monorepo (Hono API + SQLite + Next.js frontend) into a single Next.js app
-  backed by Supabase Postgres and deployed on Vercel
-  So that the stack is simpler, production-ready, and leverages the org's existing Supabase Pro and Vercel accounts
+  I want to replace the Bun monorepo architecture with a single Next.js app backed by Supabase Postgres
+  So that the project ships faster on a simpler, production-ready stack using existing Supabase Pro and Vercel accounts
 
-  Background:
-    Given the org (Guilde AI) pays for Supabase Pro and Vercel
-    And the current stack is a Bun monorepo with apps/api (Hono + SQLite) and apps/web (Next.js)
-    And there are 5 Drizzle schemas: artists, tours, gigs, bookings, riders
+  Goal Summary:
+    The PM should generate dependency-ordered migration issues that maximize delivery speed and minimize ambiguity.
 
-  # ────────────────────────────────────────────────────────────────────────
-  # PM CONSTRAINTS
-  #
-  # The attractor PM must create NO MORE THAN 3 ISSUES for this goal.
-  # Every issue must produce VISIBLE CHANGES in the running app.
-  # Every issue must include a "Visual Verification" section in its body.
-  # AGENTS.md must be updated after every PR.
-  # If more work is needed after the 3 issues, create a new PM goal.
-  # ────────────────────────────────────────────────────────────────────────
+  PM Constraints:
+    - Generate at most 3 issues for this goal; fewer is allowed when issue quality is better.
+    - Every issue must include sections: Objective, In Scope, Out of Scope, Acceptance Criteria, Visual Verification, Dependencies, Risks, PR Checklist.
+    - Every issue must include Visual Verification with concrete browser actions and expected outcomes.
+    - Prefer outcome-based criteria over file-existence criteria.
+    - If work remains after the last issue, propose the next goal explicitly.
 
-  # ── Issue 1 — Foundation: Single Next.js app, Supabase Auth, shadcn/ui ─
+  Issue Buckets:
+    - Issue 1: Foundation & Auth Flow
+    - Issue 2: Postgres Data Plane & Dashboard Data
+    - Issue 3: Navigation Surface & Production Cutover
 
-  Scenario: Monorepo is collapsed into a single Next.js app at the repo root
-    Given the apps/api and apps/web directories have been removed
-    Then the repo root should contain a Next.js App Router project
-    And "package.json" should list "next", "react", and "react-dom" as dependencies
-    And the Bun workspace configuration should be removed
+  Acceptance Criteria by Bucket:
 
-  Scenario: Supabase Auth is configured with email/password provider
-    Given the file "lib/supabase/client.ts" exists
-    And the file "lib/supabase/server.ts" exists
-    Then the Supabase client should read NEXT_PUBLIC_SUPABASE_URL from the environment
-    And it should read NEXT_PUBLIC_SUPABASE_ANON_KEY from the environment
+  Scenario: Issue 1 Objective and scope are generated correctly
+    Given Issue 1 is "Foundation & Auth Flow"
+    Then its Objective should focus on enabling a working auth-gated single-app baseline
+    And its In Scope should include single-app root setup, Supabase auth wiring, auth pages, and dashboard route protection baseline
+    And its Out of Scope should exclude full data migration and full production cutover
+    And its Dependencies should be empty or marked as first issue
 
-  Scenario: Login and signup pages exist and work
-    Given the file "app/(auth)/login/page.tsx" exists
-    And the file "app/(auth)/signup/page.tsx" exists
-    Then a user can sign up with email and password
-    And a user can log in with valid credentials
-    And unauthenticated users are redirected to the login page
+  Scenario: Issue 1 uses the approved Supabase + Next.js + Vercel starter baseline
+    Given Issue 1 exists
+    Then its Objective must include a starter-aligned migration baseline
+    And its In Scope must include adopting or aligning with the Vercel Supabase starter baseline (https://vercel.com/templates/authentication/supabase) or create-next-app --example with-supabase
+    And its Acceptance Criteria must require the project to bootstrap from the approved starter pattern before custom migration work
+    And its Out of Scope must exclude unrelated custom architecture divergence in Issue 1
 
-  Scenario: shadcn/ui is installed and configured
-    Given the file "components.json" exists
-    Then shadcn/ui components should be importable
-    And Tailwind CSS should be configured for the project
+  Scenario: Issue 1 behavior-focused acceptance criteria are generated
+    Given Issue 1 exists
+    Then Acceptance Criteria must include starter-baseline adoption outcome before auth-flow outcomes
+    And Acceptance Criteria should describe user-signup, user-login, and auth-gated access behavior
+    And criteria should avoid file-existence-only checks as primary validation
 
-  Scenario: Drizzle ORM is configured for Supabase Postgres
-    Given the file "drizzle.config.ts" exists
-    Then it should configure "pg" or "postgresql" as the dialect
-    And it should reference DATABASE_URL from the environment
+  Scenario: Issue 2 Objective and scope are generated correctly
+    Given Issue 2 is "Postgres Data Plane & Dashboard Data"
+    Then its Objective should focus on migrating domain data to Supabase Postgres and rendering seeded data in dashboard
+    And its In Scope should include pgTable migration for artists, tours, gigs, bookings, and riders
+    And its In Scope should include migrations, seed data, and dashboard reads from Supabase
+    And its Out of Scope should exclude broad navigation/page-surface completion and production cutover tasks
+    And its Dependencies must explicitly include Issue 1 completion of starter baseline + auth foundation
 
-  # Visual Verification for Issue 1:
-  #   - Navigate to the app URL → redirected to /login
-  #   - Sign up with a new email/password → account created
-  #   - Log in → redirected to the dashboard
-  #   - shadcn/ui button and input components render correctly on auth pages
+  Scenario: Issue 2 behavior-focused acceptance criteria are generated
+    Given Issue 2 exists
+    Then Acceptance Criteria should describe successful migration execution and visible dashboard data outcomes
+    And criteria should be measurable without relying on file-existence-only checks
 
-  # ── Issue 2 — Database: Migrate schemas to pgTable, seed data, Dashboard ─
+  Scenario: Issue 3 Objective and scope are generated correctly
+    Given Issue 3 is "Navigation Surface & Production Cutover"
+    Then its Objective should focus on completing user-facing dashboard navigation and production readiness
+    And its In Scope should include sidebar navigation, tours/riders/settings page data rendering, Vercel environment wiring, and production accessibility
+    And its Out of Scope should exclude net-new feature expansion unrelated to migration cutover
+    And its Dependencies must explicitly include Issue 2 and starter-aligned app shell continuity from Issue 1/2
 
-  Scenario: All 5 schemas are migrated from SQLite to Postgres pgTable
-    Given the following schema files exist under "db/schema/":
-      | file         |
-      | artists.ts   |
-      | tours.ts     |
-      | gigs.ts      |
-      | bookings.ts  |
-      | riders.ts    |
-    Then each schema should use "pgTable" from "drizzle-orm/pg-core"
-    And each schema should preserve all columns and relationships from the SQLite version
-    And enums should use "pgEnum" instead of SQLite text checks
+  Scenario: Issue 3 behavior-focused acceptance criteria are generated
+    Given Issue 3 exists
+    Then Acceptance Criteria should describe production login accessibility, protected route behavior, and page-to-page navigation outcomes
+    And criteria should avoid ambiguous phrases like "wire everything" or "complete all remaining pages"
 
-  Scenario: Drizzle migrations are generated and applied to Supabase
-    Given "package.json" has "db:generate" and "db:migrate" scripts
-    When I run "npm run db:generate"
-    Then SQL migration files should be created
-    When I run "npm run db:migrate"
-    Then all migrations should be applied to the Supabase Postgres database
+  Visual Verification by Bucket:
 
-  Scenario: Seed script populates Supabase with sample data
-    Given "package.json" has a "db:seed" script
-    When I run "npm run db:seed"
-    Then the artists table should contain "Chic"
-    And the tours table should contain "Spring Groove Tour 2026"
-    And the gigs table should contain 5 rows across different US cities
-    And the bookings table should contain 1 flight and 1 hotel booking
-    And the riders table should contain 1 draft rider
+  Scenario: Issue 1 visual verification is concrete
+    Given Issue 1 exists
+    Then Visual Verification must include opening app from starter baseline and confirming starter-derived auth landing behavior is present
+    And Visual Verification should include opening app URL and redirect to /login
+    And Visual Verification should include signup with new credentials and successful account creation
+    And Visual Verification should include login success and dashboard shell visibility
 
-  Scenario: Dashboard page displays real data from Supabase
-    Given the user is logged in
-    When they navigate to the dashboard
-    Then the page should display the artist name "Chic"
-    And the page should display the tour name "Spring Groove Tour 2026"
-    And the page should show a summary of upcoming gigs
+  Scenario: Issue 2 visual verification is concrete
+    Given Issue 2 exists
+    Then Visual Verification should include logging in and opening dashboard
+    And Visual Verification should include seeing seeded artist and tour values from Supabase
+    And Visual Verification should include seeing a visible gigs summary/list sourced from seeded data
 
-  # Visual Verification for Issue 2:
-  #   - Log in → Dashboard loads
-  #   - Dashboard shows "Chic" as the artist
-  #   - Dashboard shows "Spring Groove Tour 2026"
-  #   - Dashboard shows gig count or upcoming gig list
+  Scenario: Issue 3 visual verification is concrete
+    Given Issue 3 exists
+    Then Visual Verification should include opening the Vercel URL and loading login page without errors
+    And Visual Verification should include successful login and sidebar visibility
+    And Visual Verification should include navigating Dashboard, Tours, Riders, and Settings with visible active-page state and rendered data
 
-  # ── Issue 3 — App Shell + Deploy: Sidebar, all pages, Vercel live ──────
-
-  Scenario: App shell has a sidebar built with shadcn/ui
-    Given the file "components/sidebar.tsx" exists
-    Then the sidebar should use shadcn/ui components
-    And it should contain navigation links for:
-      | label      |
-      | Dashboard  |
-      | Tours      |
-      | Riders     |
-      | Settings   |
-
-  Scenario: All pages are wired to Supabase data
-    Then the following page files should exist:
-      | path                          |
-      | app/(dashboard)/page.tsx      |
-      | app/(dashboard)/tours/page.tsx   |
-      | app/(dashboard)/riders/page.tsx  |
-      | app/(dashboard)/settings/page.tsx |
-    And each page should fetch data from Supabase using server components or API routes
-
-  Scenario: App is deployed and live on Vercel
-    Given the project is connected to Vercel
-    And environment variables are configured in Vercel project settings:
-      | variable                       |
-      | NEXT_PUBLIC_SUPABASE_URL       |
-      | NEXT_PUBLIC_SUPABASE_ANON_KEY  |
-      | DATABASE_URL                   |
-    When a push is made to the main branch
-    Then the app should be deployed and accessible at the Vercel URL
-    And the login page should load without errors
-
-  Scenario: Protected routes require authentication
-    Given a user is not logged in
-    When they navigate to any dashboard page
-    Then they should be redirected to the login page
-
-  # Visual Verification for Issue 3:
-  #   - Open the Vercel URL → login page loads
-  #   - Log in → dashboard with sidebar appears
-  #   - Click "Tours" in sidebar → Tours page shows tour data
-  #   - Click "Riders" in sidebar → Riders page shows rider data
-  #   - Sidebar highlights the active page
+  Stop/Carryover Rule:
+    If migration work remains after the final generated issue, output must explicitly propose the next PM goal and list remaining outcomes.
+    And if starter baseline was not established in Issue 1, the next goal must begin with starter-baseline remediation before any new migration tasks.

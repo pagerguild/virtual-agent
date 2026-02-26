@@ -2,120 +2,169 @@
 
 ## Mission
 
-Virtual-agent is a tour management app for music artists. It helps booking agents manage artists, tours, gigs, bookings, and technical riders.
+virtual-agent is a tour management app for music artists. It helps booking agents manage artists, tours, gigs, bookings, and technical riders.
 
-The app is a **single Next.js application** backed by **Supabase Postgres**, deployed on **Vercel**.
+Target architecture for this repository:
+- Single Next.js app (App Router)
+- Supabase Auth + Supabase Postgres
+- Drizzle ORM for schema/migrations
+- Vercel deployment
 
-## Repo Map
+## Attractor PM Output Rules (Hard Constraints)
 
-```
-/
-├── app/                    # Next.js App Router pages
-│   ├── (auth)/             # Login, signup (public routes)
-│   └── (dashboard)/        # Protected routes (Dashboard, Tours, Riders, Settings)
-├── components/             # React components (shadcn/ui based)
-├── db/
-│   ├── schema/             # Drizzle ORM schemas (pgTable)
-│   ├── migrations/         # Drizzle migration files
-│   └── seed.ts             # Seed script for sample data
-├── lib/
-│   ├── supabase/           # Supabase client (browser) and server helpers
-│   └── ...                 # Shared utilities
-├── specs/features/         # Gherkin feature specs (PM goals)
-├── drizzle.config.ts       # Drizzle config targeting Supabase Postgres
-├── AGENTS.md               # This file — agent guidelines
-└── package.json
-```
+These are mandatory for issue generation from any feature goal.
 
-## Issue Creation Constraints
+1. Issue count:
+- Generate at most 3 issues per goal.
+- Fewer than 3 issues is acceptable if quality is higher.
+- If work remains after the final issue, explicitly propose the next goal.
 
-These rules apply to the **attractor PM agent** when creating issues from a feature spec goal.
+2. Visual verification:
+- Every issue must include a `Visual Verification` section.
+- Every issue must include concrete browser steps and expected outcomes.
+- If work is mostly infra, pair it with visible UI behavior in the same issue.
 
-### Maximum 3 Issues Per Goal
+3. Required issue sections:
+- `Objective`
+- `In Scope`
+- `Out of Scope`
+- `Acceptance Criteria`
+- `Visual Verification`
+- `Dependencies`
+- `Risks`
+- `PR Checklist`
 
-- Each PM goal (feature spec) must be broken into **no more than 3 issues**.
-- Each issue should be a meaningful, shippable increment — not a micro-task.
-- If more work is needed after the 3 issues are completed, **create a new PM goal** with a new feature spec.
+4. Criteria quality:
+- Prefer outcome-based acceptance criteria.
+- Do not use file-existence checks as primary acceptance criteria.
+- Keep dependency order explicit across issues.
 
-### Visual Verification Required
+## Issue Quality Bar
 
-- Every issue **must define a visual checkpoint** — a concrete thing you can see in the browser that proves the issue was implemented correctly.
-- Include a **"Visual Verification"** section in every issue body with bullet points describing exactly what to look for.
-- If an issue has no visible browser change, it is too low-level. Combine it with another issue.
+An issue is acceptable only if all checks pass.
 
-Example:
+Pass conditions:
+- One primary objective only.
+- Scope is bounded and shippable in one PR.
+- Dependencies are explicit and realistic.
+- Acceptance criteria describe behavior, not implementation trivia.
+- Visual verification has at least 3 browser actions with expected outcomes.
+- Risks call out likely migration breakpoints.
+
+Fail conditions:
+- Mixed unrelated objectives in one issue.
+- Broad buckets like "all remaining pages" without boundaries.
+- Deploy + major feature build combined without strict scope control.
+- Acceptance criteria that are mostly "file exists" checks.
+
+## Issue Template (required headings)
+
+Use this exact structure in every generated issue body.
 
 ```markdown
+## Objective
+<single sentence describing the user or business outcome>
+
+## In Scope
+- <bounded deliverable 1>
+- <bounded deliverable 2>
+
+## Out of Scope
+- <explicit non-goals to prevent scope creep>
+
+## Acceptance Criteria
+- <behavior-focused criterion 1>
+- <behavior-focused criterion 2>
+
 ## Visual Verification
-- Navigate to /login → login form renders with email and password fields
-- Submit valid credentials → redirected to dashboard
-- Dashboard shows "Chic" as the artist name
+- <browser step 1 -> expected visible result>
+- <browser step 2 -> expected visible result>
+- <browser step 3 -> expected visible result>
+
+## Dependencies
+- <upstream issue or prerequisite>
+
+## Risks
+- <key implementation or migration risk>
+
+## PR Checklist
+- [ ] Acceptance criteria implemented
+- [ ] Visual verification performed
+- [ ] Tests updated/added as needed
+- [ ] Docs updated if behavior or workflow changed
 ```
 
-### AGENTS.md Update Requirement
+## Spec Authoring Standard for /specs/features
 
-- **After every PR**, check whether AGENTS.md needs updating.
-- If anything was wrong, unclear, missing, or could be more explicit — update AGENTS.md in the same PR or a follow-up.
-- This ensures agent instructions improve over time based on real implementation experience.
-- Common updates: new file paths, changed conventions, discovered gotchas, corrected assumptions.
+Every feature goal spec should be written to maximize Attractor PM issue quality.
 
-## Tech Stack
+Required sections:
+- `Goal Summary`
+- `PM Constraints`
+- `Issue Buckets`
+- `Acceptance Criteria by Bucket`
+- `Visual Verification by Bucket`
+- `Stop/Carryover Rule`
 
-| Layer          | Technology                          |
-| -------------- | ----------------------------------- |
-| Framework      | Next.js (App Router)                |
-| UI             | shadcn/ui + Tailwind CSS            |
-| Auth           | Supabase Auth (email/password)      |
-| Database       | Supabase Postgres                   |
-| ORM            | Drizzle ORM (`pgTable`, `pgEnum`)   |
-| Deployment     | Vercel                              |
-| Package Mgr    | npm (not Bun — Vercel compatibility)|
+Authoring rules:
+- Keep bucket boundaries strict and dependency-ordered.
+- Each bucket must map to one shippable issue.
+- Use behavior and user-visible outcomes.
+- State constraints in plain text, not only comments.
 
-## Coding Standards
+## Issue Slicing Heuristics
+
+- One primary objective per issue.
+- Dependency order must be explicit (`Issue 2 depends on Issue 1`, etc.).
+- If a criterion has no visible UI effect, pair it with visible UI behavior in the same issue.
+- Prefer vertical slices (UI + data + auth where needed) over horizontal micro-tasks.
+
+## Anti-Patterns to Reject
+
+- File-existence-only acceptance criteria.
+- "All remaining pages" scope bombs.
+- Deploy + broad feature development in one issue unless tightly bounded.
+- Ambiguous language like "wire everything" or "finish migration" without measurable outcomes.
+
+## AGENTS.md Update Rule
+
+Do not update AGENTS.md after every PR by default.
+
+Update AGENTS.md only when one or more of these are true:
+- A reusable rule was discovered.
+- A path/convention changed and future agents need it.
+- A workflow gotcha caused avoidable rework.
+
+## Goal Prompt Pattern
+
+Use this canonical pattern for this migration goal:
+
+```bash
+attractor pm --goal "Review specs/features/migrate-supabase-vercel.feature and generate up to 3 dependency-ordered issues (fewer allowed). Each issue must include Objective, In Scope, Out of Scope, Acceptance Criteria, Visual Verification, Dependencies, Risks, and PR Checklist. Prefer outcome-based criteria over file-existence checks. If work remains after issue 3, propose the next goal explicitly."
+```
+
+## Engineering Standards (Target Stack)
 
 ### Next.js
-
-- Use the App Router (`app/` directory), not Pages Router.
-- Default to **Server Components**. Only use `"use client"` when the component needs browser APIs, event handlers, or React hooks.
-- Use route groups `(auth)` and `(dashboard)` to separate public and protected layouts.
-- Fetch data in Server Components using the Supabase server client — avoid client-side fetching for initial page loads.
+- Use App Router (`app/`).
+- Default to Server Components.
+- Use `"use client"` only when hooks/event handlers/browser APIs are required.
+- Prefer server-side data loading for initial page render.
 
 ### Supabase
+- Browser client in `lib/supabase/client.ts`.
+- Server client in `lib/supabase/server.ts`.
+- Protect dashboard routes; redirect unauthenticated users to `/login`.
+- Never expose `service_role` in client-side code.
 
-- Browser client: `lib/supabase/client.ts` — uses `createBrowserClient` from `@supabase/ssr`.
-- Server client: `lib/supabase/server.ts` — uses `createServerClient` from `@supabase/ssr` with cookie handling.
-- Auth: Use Supabase Auth middleware to protect routes. Redirect unauthenticated users to `/login`.
-- Never expose the `service_role` key in client-side code.
-
-### Drizzle ORM (Postgres)
-
-- Schemas use `pgTable` and `pgEnum` from `drizzle-orm/pg-core`.
-- Each table in its own file under `db/schema/`.
-- Barrel export from `db/schema/index.ts`.
-- Migrations generated with `drizzle-kit generate` and applied with `drizzle-kit migrate`.
-- Connection string from `DATABASE_URL` environment variable.
-
-### shadcn/ui
-
-- Install components via `npx shadcn@latest add <component>`.
-- Components live in `components/ui/`.
-- Custom components (sidebar, data tables, etc.) live in `components/`.
-- Use shadcn/ui primitives rather than building from scratch.
+### Drizzle (Postgres)
+- Use `pgTable` and `pgEnum` from `drizzle-orm/pg-core`.
+- Keep table definitions in `db/schema/` with barrel export.
+- Generate and apply migrations via scripts.
+- Use `DATABASE_URL` for connection.
 
 ### General
-
 - TypeScript strict mode.
-- No `any` types — use proper typing.
-- Prefer named exports over default exports.
-- Keep components small and focused.
-- Colocate related files (component + its types/utils) when practical.
-
-## Engineering Agent Workflow
-
-1. **Read the issue** — understand the visual verification criteria before writing code.
-2. **Read AGENTS.md** — follow the conventions documented here.
-3. **Read the relevant feature spec** in `specs/features/` for full context.
-4. **Implement** — write code that satisfies the issue's acceptance criteria and visual verification.
-5. **Test locally** — verify the visual checkpoint yourself before opening a PR.
-6. **Update AGENTS.md** — if you discovered anything that should be documented (new paths, gotchas, convention changes), update this file.
-7. **Open PR** — include the visual verification steps in the PR description so reviewers know what to check.
+- No `any` unless explicitly justified.
+- Keep components focused and cohesive.
+- Prefer named exports.
