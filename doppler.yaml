@@ -1,0 +1,3 @@
+setup:
+  project: virtual-agent
+  config: dev
