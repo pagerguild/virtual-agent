@@ -12,6 +12,8 @@ dist/
 
 # Database
 *.db
+*.db-shm
+*.db-wal
 
 # OS files
 .DS_Store
@@ -28,6 +30,9 @@ bun.lockb
 
 # Turbo
 .turbo/
+
+# Test results
+test-results/
 
 # Attractor logs
 .attractor/
