@@ -165,7 +165,7 @@ export function FlightOptions({ tourId }: FlightOptionsProps) {
                         className="text-right font-semibold text-gray-900"
                         data-testid="flight-offer-price"
                       >
-                        ${offer.price}
+                        {formatPrice(offer.price, offer.currency)}
                         <span className="ml-1 text-xs font-normal text-gray-400">
                           {offer.currency}
                         </span>
@@ -199,4 +199,20 @@ function formatTime(isoString: string): string {
     minute: "2-digit",
     hour12: true,
   });
+}
+
+function formatPrice(price: string, currency: string): string {
+  const value = Number(price);
+  if (!Number.isFinite(value)) return price;
+
+  try {
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency,
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 2,
+    }).format(value);
+  } catch {
+    return price;
+  }
 }

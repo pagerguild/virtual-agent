@@ -144,6 +144,13 @@ describe("AC #4 — API route serves flight options", () => {
     expect(content).toContain("searchParams");
   });
 
+  it("enforces tour ownership before returning flight data", () => {
+    const content = readText("app/api/flights/route.ts");
+    expect(content).toContain("db.query.tours.findFirst");
+    expect(content).toContain("db.query.artists.findFirst");
+    expect(content).toContain("Forbidden");
+  });
+
   it("fetches gigs for the tour from database", () => {
     const content = readText("app/api/flights/route.ts");
     expect(content).toContain("db.query.gigs.findMany");
@@ -220,6 +227,12 @@ describe("AC #5 — Dashboard shows flight options between consecutive gig citie
     expect(content).toContain("offer.durationFormatted");
     expect(content).toContain("offer.price");
     expect(content).toContain('data-testid="flight-offer"');
+  });
+
+  it("FlightOptions formats currency based on offer currency code", () => {
+    const content = readText("components/flight-options.tsx");
+    expect(content).toContain("formatPrice(");
+    expect(content).toContain("Intl.NumberFormat");
   });
 
   it("FlightOptions displays stops information", () => {

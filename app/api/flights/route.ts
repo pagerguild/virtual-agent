@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { db } from "@/db";
+import { artists } from "@/db/schema";
 import { computeFlightLegs } from "@/lib/flights/compute-legs";
 import { searchFlights } from "@/lib/flights/amadeus";
 import type { FlightLeg, FlightOffer } from "@/lib/flights";
+import { eq } from "drizzle-orm";
 
 export interface FlightLegWithOffers extends FlightLeg {
   offers: FlightOffer[];
@@ -38,6 +40,27 @@ export async function GET(request: NextRequest) {
       { error: "tourId query parameter is required" },
       { status: 400 }
     );
+  }
+
+  // Verify the authenticated user owns this tour via artist email.
+  const tour = await db.query.tours.findFirst({
+    where: (tours, { eq }) => eq(tours.id, tourId),
+  });
+
+  if (!tour) {
+    return NextResponse.json({ error: "Tour not found" }, { status: 404 });
+  }
+
+  if (!user.email) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const artist = await db.query.artists.findFirst({
+    where: eq(artists.id, tour.artist_id),
+  });
+
+  if (!artist || artist.email.toLowerCase() !== user.email.toLowerCase()) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
   // Fetch gigs for this tour, ordered by date
