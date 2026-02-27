@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { SignOutButton } from "@/components/sign-out-button";
 import { getDashboardData } from "@/db/queries/dashboard";
+import { FlightOptions } from "@/components/flight-options";
 
 export const dynamic = "force-dynamic";
 
@@ -124,6 +125,9 @@ export default async function DashboardPage() {
           <p className="mt-2 text-sm text-gray-500">No gigs scheduled yet.</p>
         )}
       </section>
+
+      {/* Flight Options */}
+      {tour && gigs.length >= 2 && <FlightOptions tourId={tour.id} />}
 
       {/* Bookings */}
       <section data-testid="bookings-section">
